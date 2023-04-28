@@ -31,6 +31,7 @@ Overall, I'm really proud of how Note-It-Down turned out. It's a great example o
 
 ## Take A Look At Our Application In Action!
 
+- Deployed Site On Heroku - [Note it Down!](https://note-it-down.herokuapp.com/)
 - ![Note It Down!](https://user-images.githubusercontent.com/127361736/235059034-78b9ac82-5a9b-47e4-b952-3ffd79b3ca79.gif)
 
 ---
