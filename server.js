@@ -31,3 +31,66 @@ app.get("/api/notes", (req, res) => {
     })
     .catch((err) => console.error(err));
 });
+
+// ? sets up a route handler using the Express.js framework that responds to any HTTP GET request to any URL path with a file send operation that sends the index.html file located in the './public' directory relative to the current working directory of the Node.js application.
+app.get("*", (req, res) =>
+  res.sendFile(path.join(__dirname, "./public/index.html"))
+);
+
+// ? sets up a route handler using the Express.js framework that handles HTTP POST requests to the '/api/notes' URL path.
+app.post("/api/notes", (req, res) => {
+  const { title, text } = req.body;
+  if (title && text) {
+    const newNote = {
+      title,
+      text,
+    };
+    readFile(path.join(__dirname, "./db/db.json"))
+      .then((text) => {
+        const notes = JSON.parse(text);
+        notes.push(newNote);
+        notes.forEach((obj, index) => {
+          obj.id = index + 1;
+        });
+        return JSON.stringify(notes, null, 4);
+      })
+      .then((notes) => {
+        writeFile(path.join(__dirname, "./db/db.json"), notes);
+      })
+      .then(() => {
+        console.info("Note successfully saved.");
+        res.send("Note successfully saved.");
+      })
+      .catch((err) => console.error(err));
+  } else {
+    res.status(500).json("Error occurred while saving the note.");
+  }
+});
+
+// ? sets up a route handler using the Express.js framework that deletes a note with a specified ID from a JSON file. It then assigns new unique IDs to the remaining notes, writes the updated array of notes back to the JSON file, and responds with a success message. Finally, the code starts listening for incoming HTTP requests on a specified port and logs a message to the console indicating that the application is running.
+app.delete("/api/notes/:id", (req, res) => {
+  let deleteID = req.params.id;
+  console.log(deleteID);
+
+  readFile(path.join(__dirname, "./db/db.json"))
+    .then((text) => {
+      const notes = JSON.parse(text);
+      const newNotes = notes.filter((obj) => obj.id != deleteID);
+      newNotes.forEach((obj, index) => {
+        obj.id = index + 1;
+      });
+      return JSON.stringify(newNotes, null, 4);
+    })
+    .then((notes) => {
+      writeFile(path.join(__dirname, "./db/db.json"), notes);
+    })
+    .then(() => {
+      console.info("Note successfully deleted.");
+      res.send("Note successfully deleted.");
+    })
+    .catch((err) => console.error(err));
+});
+
+app.listen(PORT, () =>
+  console.log(`App listening at http://localhost:${PORT}`)
+);
